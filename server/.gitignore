@@ -1,0 +1,6 @@
+.idea/
+.vscode/
+.vim/
+tmp/
+gen/
+main
