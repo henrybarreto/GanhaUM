@@ -1,0 +1,169 @@
+.app {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+    "header"
+    "main"
+    "footer";
+    justify-items: center;
+}
+
+.header {
+    grid-area: header;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 40px 0;
+}
+
+.header .logo {
+    width: auto;
+    height: auto;
+}
+
+.main {
+    grid-area: main;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    margin: 20px 20px;
+    max-width: 1100px;
+}
+
+.campaign {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 10px;
+    background: #D9D9D9;
+}
+
+.campaign-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.campaign-label {
+    font-size: 1.2em;
+}
+
+.campaign-title {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+ .campaign-main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.campaign-thumbnail {
+    margin: 10px 0;
+    width: 250px;
+    height: 300px;
+    background: #000000;
+}
+
+.campaign-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 10px 0;
+}
+
+.campaign-info-list {
+    list-style: none;
+}
+
+.campaign-info-item {
+    display: flex;
+    flex-direction: row;
+    margin: 10px 0;
+    align-items: center;
+}
+
+.campaign-info-item-text {
+    display: flex;
+    width: 100%;
+    font-size: 1.2em;
+    justify-content: space-between;
+}
+
+.campaign-info-item-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2em;
+    padding: 10px;
+    border: 1px solid #000000;
+}
+
+.campaign-info-item-label {
+    padding-left: 10px;
+}
+
+
+.campaign-info-item-value {
+    padding-left: 10px;
+    font-weight: bold;
+}
+
+.campaign-form {
+    display: none;
+}
+
+.campaign-button {
+    margin: 10px 0;
+    width: 250px;
+    height: 50px;
+    background: #000000;
+    color: #FFFFFF;
+    font-size: 1em;
+}
+
+.campaign-footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 10px;
+}
+
+.campaign-footer-description {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+}
+
+.campaign-footer-description-title {
+    margin: 10px 0;
+    align-self: flex-start;
+    font-weight: bold;
+}
+
+.footer {
+    grid-area: footer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100px;
+    margin-top: 50px;
+    background: #D9D9D9;
+}

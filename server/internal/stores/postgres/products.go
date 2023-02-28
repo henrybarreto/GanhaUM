@@ -30,15 +30,15 @@ func (r *Store) GetProduct(id int) (*models.Product, error) {
 		return nil, NewErrProductQuery(err)
 	}
 
-	if !rows.NextResultSet() {
-		return nil, NewErrProductNotFound(err)
-	}
-
 	for rows.Next() {
 		err = rows.Scan(&model.ID, &model.Thumbnail, &model.Name, &model.Description, &model.Type, &model.Value, &model.CreatedAt, &model.UpdatedAt)
 		if err != nil {
 			return nil, NewErrProductScan(err)
 		}
+	}
+
+	if model.ID == 0 {
+		return nil, NewErrProductNotFound(err)
 	}
 
 	return &model, nil
@@ -50,10 +50,6 @@ func (r *Store) GetProducts(page int, limit int) ([]models.Product, error) {
 		return nil, NewErrProductQuery(err)
 	}
 
-	if !rows.NextResultSet() {
-		return nil, NewErrProductsEmpty(err)
-	}
-
 	var products []models.Product
 	for rows.Next() {
 		var p models.Product
@@ -63,6 +59,10 @@ func (r *Store) GetProducts(page int, limit int) ([]models.Product, error) {
 		}
 
 		products = append(products, p)
+	}
+
+	if products == nil {
+		return nil, NewErrProductsEmpty(err)
 	}
 
 	return products, nil

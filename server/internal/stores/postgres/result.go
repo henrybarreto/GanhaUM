@@ -50,17 +50,16 @@ func (r *Store) GetResult(id int) (*models.Result, error) {
 		return nil, NewErrResultQuery(err)
 	}
 
-	if !rows.NextResultSet() {
-		// return nil, fmt.Errorf("result not found")
-		return nil, NewErrResultNotFound(err)
-	}
-
 	for rows.Next() {
 		err = rows.Scan(&model.ID, &model.Campaign.ID, &model.Amount, &model.Receiver.ID, &model.ClosedAt)
 		if err != nil {
 			// return nil, fmt.Errorf("failed to scan the result: %w", err)
 			return nil, NewErrResultScan(err)
 		}
+	}
+
+	if model.ID == 0 {
+		return nil, NewErrResultNotFound(err)
 	}
 
 	return &model, nil
@@ -73,11 +72,6 @@ func (r *Store) GetResults() ([]models.Result, error) {
 		return nil, NewErrResultQuery(err)
 	}
 
-	if !rows.NextResultSet() {
-		// return nil, fmt.Errorf("results not found")
-		return nil, NewErrResultNotFound(err)
-	}
-
 	var results []models.Result
 	for rows.Next() {
 		var r models.Result
@@ -88,6 +82,10 @@ func (r *Store) GetResults() ([]models.Result, error) {
 		}
 
 		results = append(results, r)
+	}
+
+	if results == nil {
+		return nil, NewErrResultNotFound(err)
 	}
 
 	return results, nil

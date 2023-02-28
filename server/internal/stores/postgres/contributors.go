@@ -41,17 +41,16 @@ func (r *Store) GetContributor(id int, campaignID int) (*models.Contributor, err
 		return nil, NewErrContributorQuery(err)
 	}
 
-	if !rows.NextResultSet() {
-		// return nil, fmt.Errorf("contributor not found")
-		return nil, NewErrContributorNotFound(err)
-	}
-
 	for rows.Next() {
 		err := rows.Scan(&model.ID, &model.Name, &model.Email, &model.Phone, &model.Campaign.ID, &model.Confirmed, &model.CreatedAt, &model.UpdatedAt)
 		if err != nil {
 			// return nil, fmt.Errorf("failed to scan the contributor: %w", err)
 			return nil, NewErrContributorScan(err)
 		}
+	}
+
+	if model.ID == 0 {
+		return nil, NewErrContributorNotFound(err)
 	}
 
 	return &model, nil
@@ -64,11 +63,6 @@ func (r *Store) GetContributors(campaignID int) ([]models.Contributor, error) {
 		return nil, NewErrContributorQuery(err)
 	}
 
-	if !rows.NextResultSet() {
-		// return nil, fmt.Errorf("contributors' not found")
-		return nil, NewErrContributorNotFound(err)
-	}
-
 	var contributors []models.Contributor
 	for rows.Next() {
 		var c models.Contributor
@@ -79,6 +73,10 @@ func (r *Store) GetContributors(campaignID int) ([]models.Contributor, error) {
 		}
 
 		contributors = append(contributors, c)
+	}
+
+	if contributors == nil {
+		return nil, NewErrContributorNotFound(err)
 	}
 
 	return contributors, nil

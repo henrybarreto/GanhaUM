@@ -2,12 +2,13 @@ package gin
 
 import (
 	"fmt"
-	"ganhaum.henrybarreto.dev/internal/api/http/frameworks/gin/handlers"
-	middleware2 "ganhaum.henrybarreto.dev/internal/api/http/frameworks/gin/middleware"
-	paths2 "ganhaum.henrybarreto.dev/internal/api/http/paths"
-	"ganhaum.henrybarreto.dev/internal/services"
 
+	"ganhaum.henrybarreto.dev/internal/api/http/frameworks/gin/handlers"
+	"ganhaum.henrybarreto.dev/internal/api/http/frameworks/gin/middleware"
+	"ganhaum.henrybarreto.dev/internal/api/http/paths"
+	"ganhaum.henrybarreto.dev/internal/services"
 	"github.com/gin-gonic/gin"
+    "github.com/gin-contrib/cors"
 )
 
 type Options struct {
@@ -24,37 +25,43 @@ func NewGinServer(service services.Services, options Options) error {
 	server.Use(gin.Logger())
 	server.Use(gin.Recovery())
 
-	api := server.Group(paths2.API)
+	api := server.Group(paths.API)
+    api.Use(cors.New(cors.Config{
+        AllowOrigins:     []string{"*"},
+        AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+    }))
 
-	authenticated := api.Group(paths2.Authenticated)
-	authenticated.Use(middleware2.AuthenticationJWT)
+	public := api.Group(paths.Public)
+	public.POST(paths.CreateContributor, handler.CreateContributor)
 
-	authenticated.POST(paths2.CreateProduct, handler.CreateProduct)
-	authenticated.POST(paths2.CreateCampaign, handler.CreateCampaign)
-	authenticated.POST(paths2.CreateResult, handler.CreateResult)
+	public.GET(paths.GetProduct, handler.GetProduct)
+	public.GET(paths.GetProducts, handler.GetProducts)
+	public.GET(paths.GetCampaign, handler.GetCampaign)
+	public.GET(paths.GetCampaigns, handler.GetCampaigns)
+	public.GET(paths.GetContributor, handler.GetContributor)
+	public.GET(paths.GetContributors, handler.GetContributors)
+	public.GET(paths.GetResult, handler.GetResult)
+	public.GET(paths.GetResults, handler.GetResults)
 
-	authenticated.PUT(paths2.UpdateProduct, handler.UpdateProduct)
-	authenticated.PUT(paths2.UpdateCampaign, handler.UpdateCampaign)
-	authenticated.DELETE(paths2.DeleteProduct, handler.DeleteProduct)
-	authenticated.DELETE(paths2.DeleteCampaign, handler.DeleteCampaign)
+	public.GET(paths.Contribute, handler.Contribute)
 
-	public := api.Group(paths2.Public)
-	public.POST(paths2.CreateContributor, handler.CreateContributor)
+	authenticated := api.Group(paths.Authenticated)
+	authenticated.Use(middleware.AuthenticationJWT)
 
-	public.GET(paths2.GetProduct, handler.GetProduct)
-	public.GET(paths2.GetProducts, handler.GetProducts)
-	public.GET(paths2.GetCampaign, handler.GetCampaign)
-	public.GET(paths2.GetCampaigns, handler.GetCampaigns)
-	public.GET(paths2.GetContributor, handler.GetContributor)
-	public.GET(paths2.GetContributors, handler.GetContributors)
-	public.GET(paths2.GetResult, handler.GetResult)
-	public.GET(paths2.GetResults, handler.GetResults)
+	authenticated.POST(paths.CreateProduct, handler.CreateProduct)
+	authenticated.POST(paths.CreateCampaign, handler.CreateCampaign)
+	authenticated.POST(paths.CreateResult, handler.CreateResult)
 
-	external := api.Group(paths2.External)
-	external.Use(middleware2.PermissionAllowOnly(options.AllowedExternalAddress...))
+	authenticated.PUT(paths.UpdateProduct, handler.UpdateProduct)
+	authenticated.PUT(paths.UpdateCampaign, handler.UpdateCampaign)
+	authenticated.DELETE(paths.DeleteProduct, handler.DeleteProduct)
+	authenticated.DELETE(paths.DeleteCampaign, handler.DeleteCampaign)
 
-	external.POST(paths2.ConfirmContributor, handler.ConfirmContributor)
-	external.POST(paths2.CreateResult, handler.CreateResult)
+	webhook := api.Group(paths.Webhook)
+	webhook.Use(middleware.PermissionAllowOnly(options.AllowedExternalAddress...))
+
+	webhook.POST(paths.ConfirmContributor, handler.ConfirmContributor)
+	webhook.POST(paths.CreateResult, handler.CreateResult)
 
 	if err := server.Run(options.Address); err != nil {
 		return fmt.Errorf("failed to create the Gin HTTP server: %w", err)

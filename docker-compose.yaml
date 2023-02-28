@@ -7,8 +7,6 @@ services:
       POSTGRES_PASSWORD: password
     ports:
       - 5432:5432
-    networks:
-      - default
   server:
     build:
       context: server
@@ -17,12 +15,22 @@ services:
     entrypoint: ./entrypoint.sh
     depends_on:
       - database
+    environment:
+      - STRIPE_SECRET_KEY=
+      - STRIPE_PRICE_ID=
     volumes:
       - ./server:/app
     ports:
       - 8080:8080
-    networks:
-      - default
-networks:
-  default:
-    driver: host
+  web:
+    build:
+      context: web
+      dockerfile: dockerfile
+    image: ganhaum
+    entrypoint: ./entrypoint.sh
+    depends_on:
+      - server
+    volumes:
+      - ./web:/app
+    ports:
+      - 3000:3000

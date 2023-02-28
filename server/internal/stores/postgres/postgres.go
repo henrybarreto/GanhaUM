@@ -20,7 +20,7 @@ var NewErrPingDatabase = func(err error) error {
 }
 
 func NewStore(username string, password string, database string) (stores2.Stores, error) {
-	db, err := sql.Open("postgres", "postgres://"+username+":"+password+"@postgres/"+database+"?sslmode=disable")
+	db, err := sql.Open("postgres", "postgres://"+username+":"+password+"@database/"+database+"?sslmode=disable")
 	if err != nil {
 		return nil, NewErrConnectDatabase(err)
 	}

@@ -1,0 +1,6 @@
+FROM node:16.13.0-alpine3.14 AS ganhaum
+RUN apk add npm
+WORKDIR /app
+COPY . .
+RUN npm install
+EXPOSE 3000

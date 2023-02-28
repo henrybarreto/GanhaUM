@@ -41,17 +41,16 @@ func (r *Store) GetCampaign(id int) (*models.Campaign, error) {
 		return nil, NewErrCampaignQuery(err)
 	}
 
-	if !rows.NextResultSet() {
-		// return nil, fmt.Errorf("campaign not found")
-		return nil, NewErrCampaignNotFound(err)
-	}
-
 	for rows.Next() {
 		err = rows.Scan(&model.ID, &model.Title, &model.Value, &model.Product.ID, &model.RequiredContributors, &model.TotalContributors, &model.StartedAt, &model.UpdatedAt, &model.ClosedAt)
 		if err != nil {
 			// return nil, fmt.Errorf("failed to scan the campaign: %w", err)
 			return nil, NewErrCampaignScan(err)
 		}
+	}
+
+	if model.ID == 0 {
+		return nil, NewErrCampaignNotFound(err)
 	}
 
 	return &model, nil
@@ -64,10 +63,6 @@ func (r *Store) GetCampaigns(page int, limit int) ([]models.Campaign, error) {
 		return nil, NewErrCampaignQuery(err)
 	}
 
-	if !rows.NextResultSet() {
-		return nil, NewErrCampaignEmpty(err)
-	}
-
 	var campaigns []models.Campaign
 	for rows.Next() {
 		var c models.Campaign
@@ -78,6 +73,10 @@ func (r *Store) GetCampaigns(page int, limit int) ([]models.Campaign, error) {
 		}
 
 		campaigns = append(campaigns, c)
+	}
+
+	if campaigns == nil {
+		return nil, NewErrCampaignNotFound(err)
 	}
 
 	return campaigns, nil
